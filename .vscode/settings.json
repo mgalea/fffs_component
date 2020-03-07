@@ -1,0 +1,23 @@
+{
+    "C_Cpp.clang_format_style": "Visual Studio",
+    "editor.formatOnSave": false,
+    "[cpp]": {
+        "editor.quickSuggestions": true
+    },
+    "[c]": {
+        "editor.quickSuggestions": true
+    },
+    "C_Cpp.intelliSenseEngineFallback": "Disabled",
+    "files.associations": {
+        "sdmmc_cmd.h": "c",
+        "sdspi_host.h": "c",
+        "xlocmon": "c",
+        "future": "c",
+        "system_error": "c",
+        "*.idl": "c",
+        "*.ipp": "c",
+        "algorithm": "cpp",
+        "cstdlib": "cpp",
+        "random": "cpp"
+    }
+} 
