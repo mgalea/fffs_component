@@ -18,6 +18,11 @@
         "*.ipp": "c",
         "algorithm": "cpp",
         "cstdlib": "cpp",
-        "random": "cpp"
+        "random": "cpp",
+        "xlocale": "c",
+        "xlocmes": "c",
+        "*.inc": "c",
+        "semphr.h": "c",
+        "xiosbase": "cpp"
     }
 } 

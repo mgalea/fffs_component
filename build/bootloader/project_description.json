@@ -1,8 +1,8 @@
 {
     "project_name":       "bootloader",
     "project_path":       "C:/esp-idf-4-0/components/bootloader/subproject",
-    "build_dir":          "C:/esp-idf-4-0/sd_card/build/bootloader",
-    "config_file":        "C:/esp-idf-4-0/sd_card/sdkconfig",
+    "build_dir":          "C:/esp-idf-4-0/fffs/build/bootloader",
+    "config_file":        "C:/esp-idf-4-0/fffs/sdkconfig",
     "config_defaults":    "",
     "app_elf":            "bootloader.elf",
     "app_bin":            "bootloader.bin",

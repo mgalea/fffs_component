@@ -6,7 +6,8 @@
             "cppStandard": "c++17",
             "includePath": [
                 "${config:idf.espIdfPath}/components/**",
-                "../components/**"
+                "../components/**",
+                "${workspaceFolder}/main/include"
             ],
             "browse": {
                 "path": [

@@ -1266,7 +1266,7 @@ rule CXX_STATIC_LIBRARY_LINKER____idf_main
 # Rule for re-running cmake.
 
 rule RERUN_CMAKE
-  command = C:\espressif\tools\cmake\3.13.4\bin\cmake.exe -SC:\esp-idf-4-0\sd_card -BC:\esp-idf-4-0\sd_card\build
+  command = C:\espressif\tools\cmake\3.13.4\bin\cmake.exe -SC:\esp-idf-4-0\fffs -BC:\esp-idf-4-0\fffs\build
   description = Re-running CMake...
   generator = 1
 

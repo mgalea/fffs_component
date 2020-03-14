@@ -1,2 +1,8 @@
-idf_component_register(SRCS "sd_card_example_main.c"
-                    INCLUDE_DIRS ".")
+idf_component_register(SRCS "src/fffs.c"
+                            "src/fffs_utils.c"
+                            "src/fffs_disk.c"
+                            "src/main.c"
+                            "src/fffs_rtos.c"
+                    INCLUDE_DIRS 
+                    "include"
+                    ".")

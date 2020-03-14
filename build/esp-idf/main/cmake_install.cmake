@@ -1,4 +1,4 @@
-# Install script for directory: C:/esp-idf-4-0/sd_card/main
+# Install script for directory: C:/esp-idf-4-0/fffs/main
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
