@@ -156,7 +156,7 @@ CMAKE_PROJECT_DESCRIPTION:STATIC=
 CMAKE_PROJECT_HOMEPAGE_URL:STATIC=
 
 //Value Computed by CMake
-CMAKE_PROJECT_NAME:STATIC=sd_card
+CMAKE_PROJECT_NAME:STATIC=fffs
 
 //Path to a program.
 CMAKE_RANLIB:FILEPATH=C:/espressif/tools/xtensa-esp32-elf/esp-2019r2-8.2.0/xtensa-esp32-elf/bin/xtensa-esp32-elf-ranlib.exe
@@ -251,7 +251,7 @@ LINK_WITH_PTHREAD:BOOL=OFF
 MCONF:FILEPATH=C:/espressif/tools/mconf/v4.6.0.0-idf-20190628/mconf-idf.exe
 
 //Path to a program.
-PERL_EXECUTABLE:FILEPATH=PERL_EXECUTABLE-NOTFOUND
+PERL_EXECUTABLE:FILEPATH=C:/Program Files/Git/usr/bin/perl.exe
 
 //No help, variable specified on the command line.
 PYTHON_DEPS_CHECKED:UNINITIALIZED=1
@@ -455,6 +455,12 @@ esp-idf_BINARY_DIR:STATIC=C:/esp-idf-4-0/fffs/build/esp-idf
 esp-idf_SOURCE_DIR:STATIC=C:/esp-idf-4-0
 
 //Value Computed by CMake
+fffs_BINARY_DIR:STATIC=C:/esp-idf-4-0/fffs/build
+
+//Value Computed by CMake
+fffs_SOURCE_DIR:STATIC=C:/esp-idf-4-0/fffs
+
+//Value Computed by CMake
 mbed TLS_BINARY_DIR:STATIC=C:/esp-idf-4-0/fffs/build/esp-idf/mbedtls/mbedtls
 
 //Value Computed by CMake
@@ -583,7 +589,7 @@ CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_NM
 CMAKE_NM-ADVANCED:INTERNAL=1
 //number of local generators
-CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=71
+CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=70
 //ADVANCED property for variable: CMAKE_OBJCOPY
 CMAKE_OBJCOPY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_OBJDUMP
@@ -623,9 +629,11 @@ CMAKE_STRIP-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_VERBOSE_MAKEFILE
 CMAKE_VERBOSE_MAKEFILE-ADVANCED:INTERNAL=1
 //Details about finding Git
-FIND_PACKAGE_MESSAGE_DETAILS_Git:INTERNAL=[C:/Program Files/Git/cmd/git.exe][v2.21.0.windows.1()]
+FIND_PACKAGE_MESSAGE_DETAILS_Git:INTERNAL=[C:/Program Files/Git/cmd/git.exe][v2.24.1.windows.2()]
+//Details about finding Perl
+FIND_PACKAGE_MESSAGE_DETAILS_Perl:INTERNAL=[C:/Program Files/Git/usr/bin/perl.exe][v5.26.2()]
 //Details about finding PythonInterp
-FIND_PACKAGE_MESSAGE_DETAILS_PythonInterp:INTERNAL=[C:/espressif/python_env/idf4.0_py3.7_env/Scripts/python.exe][v3.7()]
+FIND_PACKAGE_MESSAGE_DETAILS_PythonInterp:INTERNAL=[C:/espressif/python_env/idf4.0_py3.7_env/Scripts/python.exe][v3.7.3()]
 //ADVANCED property for variable: GIT_EXECUTABLE
 GIT_EXECUTABLE-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: PERL_EXECUTABLE

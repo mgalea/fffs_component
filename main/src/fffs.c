@@ -393,7 +393,6 @@ esp_err_t fffs_read(fffs_volume_t *fffs_vol, size_t message_num, uint8_t *messag
 
     uint32_t fetch_block;
     uint8_t partition = 0;
-    int tmp_size;
     FFFS_CHECK((message_num < fffs_vol->message_id), "Message num is too big", err);
 
     do
@@ -430,20 +429,23 @@ esp_err_t fffs_read(fffs_volume_t *fffs_vol, size_t message_num, uint8_t *messag
     FFFS_CHECK(sdmmc_read_sectors(fffs_vol->sd_card, fffs_vol->read_buf, fetch_block, 1) == ESP_OK, "Cannot read block", err);
 
     int index = 0;
-    for (unsigned char offset = (message_num - old_message_base); offset > 0; offset--)
+    int offset = 0;
+    for (unsigned char num_offset = (message_num - old_message_base); num_offset > 0; num_offset--)
     {
-        index = index + (*((uint8_t *)(fffs_vol->read_buf) + index) == 0 ? 0xFF + (*((uint8_t *)(fffs_vol->read_buf) + index + 1)) : *((uint8_t *)(fffs_vol->read_buf) + index));
+        offset = *((uint8_t *)(fffs_vol->read_buf) + index);
+
+        if (offset == 0)
+            offset = 0xFF + (*((uint8_t *)(fffs_vol->read_buf) + index + 1));
+
+        index = index + offset;
     }
 
-    tmp_size = *((uint8_t *)(fffs_vol->read_buf) + index++) - 1;
+    offset = (*((uint8_t *)(fffs_vol->read_buf) + index) == 0 ? 0xFF + (*((uint8_t *)(fffs_vol->read_buf) + index + 1)) : *((uint8_t *)(fffs_vol->read_buf) + index));
 
-    if (tmp_size == 0)
-        tmp_size = *((uint8_t *)(fffs_vol->read_buf) + index) + 0xFF;
-
-    *size = tmp_size;
+    *size = --offset;
 
     FFFS_CHECK(message != NULL, "Read length only", size_only);
-    memcpy(message, (uint8_t *)(fffs_vol->read_buf) + index + ((*size) > 0xFF ? 1 : 0), *size);
+    memcpy(message, (uint8_t *)(fffs_vol->read_buf) + index + 1 + ((*size) > 0xFF ? 1 : 0), *size);
 
 size_only:
     return ESP_OK;

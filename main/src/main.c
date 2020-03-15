@@ -35,12 +35,12 @@ void read_blocks(void *fffs_head, int blocks)
 
 void read_random_messages(void *fffs_head)
 {
-    int message_num, count = 230;
+    int message_num;
     uint8_t *message;
-    while (1)
+    for (int count = 700; count < 1000; count++)
     {
         srand(esp_timer_get_time());
-        message_num = (count++) % ((((fffs_head_t *)fffs_head)->vol->message_id));
+        message_num = (count) % ((((fffs_head_t *)fffs_head)->vol->message_id));
         printf("%d\n", message_num);
         message = calloc(fffs_head_read_binary((fffs_head_t *)fffs_head, message_num, NULL), 1);
         print_Message2ASC(message, fffs_head_read_binary((fffs_head_t *)fffs_head, message_num, message));
@@ -48,9 +48,8 @@ void read_random_messages(void *fffs_head)
         free(message);
         fflush(stdout);
     }
-
-    //vTaskDelete(0);
 }
+//vTaskDelete(0);
 
 static const char *TAG = "APP";
 
@@ -89,8 +88,6 @@ void app_main(void)
         goto err;
 
     fffs_head_t *sas_log = fffs_rw_head_Init(fffs_vol);
-
-    fffs_head_t *mqtt_log = fffs_rw_head_Init(fffs_vol);
 
     ESP_LOGI(TAG, "Partitions size (%d) %d bytes.", fffs_vol->partition_size, fffs_vol->partition_size * (PARTITION_SIZE)*SD_BLOCK_SIZE);
     ESP_LOGI(TAG, "Sector size (%d) %d bytes.", fffs_vol->sector_size, fffs_vol->sector_size * (SECTOR_SIZE)*SD_BLOCK_SIZE);

@@ -7566,13 +7566,6 @@
                 "type": "menu"
             },
             {
-                "children": [],
-                "depends_on": null,
-                "id": "component-config-sqlite3",
-                "title": "Sqlite3",
-                "type": "menu"
-            },
-            {
                 "children": [
                     {
                         "children": [],

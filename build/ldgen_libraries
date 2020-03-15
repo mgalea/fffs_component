@@ -30,7 +30,6 @@ C:/esp-idf-4-0/fffs/build/esp-idf/coap/libcoap.a
 C:/esp-idf-4-0/fffs/build/esp-idf/console/libconsole.a
 C:/esp-idf-4-0/fffs/build/esp-idf/nghttp/libnghttp.a
 C:/esp-idf-4-0/fffs/build/esp-idf/esp-tls/libesp-tls.a
-C:/esp-idf-4-0/fffs/build/esp-idf/esp32-idf-sqlite3/libesp32-idf-sqlite3.a
 C:/esp-idf-4-0/fffs/build/esp-idf/esp_adc_cal/libesp_adc_cal.a
 C:/esp-idf-4-0/fffs/build/esp-idf/esp_gdbstub/libesp_gdbstub.a
 C:/esp-idf-4-0/fffs/build/esp-idf/tcp_transport/libtcp_transport.a

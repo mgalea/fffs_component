@@ -227,7 +227,7 @@ GCC_NOT_5_2_0:STRING=1
 GIT_EXECUTABLE:FILEPATH=C:/Program Files/Git/cmd/git.exe
 
 //No help, variable specified on the command line.
-IDF_PATH:UNINITIALIZED=C:/esp-idf-4-0
+IDF_PATH:UNINITIALIZED=c:/esp-idf-4-0
 
 //IDF Build Target
 IDF_TARGET:STRING=esp32
@@ -428,7 +428,7 @@ CMAKE_STRIP-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_VERBOSE_MAKEFILE
 CMAKE_VERBOSE_MAKEFILE-ADVANCED:INTERNAL=1
 //Details about finding Git
-FIND_PACKAGE_MESSAGE_DETAILS_Git:INTERNAL=[C:/Program Files/Git/cmd/git.exe][v2.21.0.windows.1()]
+FIND_PACKAGE_MESSAGE_DETAILS_Git:INTERNAL=[C:/Program Files/Git/cmd/git.exe][v2.24.1.windows.2()]
 //ADVANCED property for variable: GIT_EXECUTABLE
 GIT_EXECUTABLE-ADVANCED:INTERNAL=1
 
