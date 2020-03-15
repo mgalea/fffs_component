@@ -25,7 +25,7 @@ void read_blocks(void *fffs_head, int blocks)
         //uint8_t *message = calloc(fffs_head_read_binary((fffs_head_t *)fffs_head, i, NULL), 1);
         //printf("%d ", message_base);
         fffs_read_block(((fffs_head_t *)fffs_head)->vol, i);
-        print_Message2HEX(((fffs_head_t *)fffs_head)->vol->read_buf, 512);
+        print_Message2ASC(((fffs_head_t *)fffs_head)->vol->read_buf, 512);
 
         //free(message);
     }
@@ -37,11 +37,11 @@ void read_random_messages(void *fffs_head)
 {
     int message_num;
     uint8_t *message;
-    for (int count = 700; count < 1000; count++)
+    for (int count = 00; count < ((fffs_head_t *)fffs_head)->vol->message_id; count++)
     {
         srand(esp_timer_get_time());
         message_num = (count) % ((((fffs_head_t *)fffs_head)->vol->message_id));
-        printf("%d\n", message_num);
+        //printf("%d\n", message_num);
         message = calloc(fffs_head_read_binary((fffs_head_t *)fffs_head, message_num, NULL), 1);
         print_Message2ASC(message, fffs_head_read_binary((fffs_head_t *)fffs_head, message_num, message));
         vTaskDelay(10);
@@ -68,10 +68,10 @@ suffered the cursed tongue of the orator";
 
     char message[400];
 
-    for (int x = 0; x < 350; x++)
+    for (int x = 0; x < 300; x++)
     {
-        sprintf(message, "ID:%05u:Length: %02u %s", fffs_head->vol->message_id, x + 20, template);
-        fffs_head_write_binary(fffs_head, (uint8_t *)message, x + 20);
+        sprintf(message, "ID:%05u:Length: %02u %s", fffs_head->vol->message_id, x + 21, template);
+        fffs_head_write_binary(fffs_head, (uint8_t *)message, x + 21);
     }
 
     return;
@@ -100,11 +100,11 @@ void app_main(void)
     ESP_LOGI(TAG, "Number of Messages in last Block: %d.", (uint32_t)fffs_vol->messages_in_block);
 
     //fffs_format(fffs_vol,1,1,false);
-    printf("Writing blocks.\n");
-    //write_blocks(sas_log);
+    //printf("Writing blocks.\n");
+    write_blocks(sas_log);
     printf("Ready writing.\n");
     read_random_messages(sas_log);
-
+    read_blocks(sas_log,5);
 err:
     sd_card_deinit(s_card);
 }

@@ -333,6 +333,7 @@ fail:
 esp_err_t fffs_write(fffs_volume_t *fffs_volume, void *message, int size)
 {
     esp_err_t err = ESP_OK;
+
     if (size > SD_BLOCK_SIZE - 2 || size == 0) //messages can only 510 bytes long  since the first two bytes must be reserved for the next message offset
         return ESP_ERR_INVALID_SIZE;
 
@@ -346,19 +347,17 @@ esp_err_t fffs_write(fffs_volume_t *fffs_volume, void *message, int size)
     do
     {
         tmp = *((uint8_t *)(fffs_volume->read_buf) + i);
-        tmp = (tmp == 0 && *((uint8_t *)(fffs_volume->read_buf) + i + 1) > 0) ? (*((uint8_t *)(fffs_volume->read_buf) + i + 1)) + 0x100 : tmp;
-
-        if ((i + tmp) >= (SD_BLOCK_SIZE - 2)) //2 is the size of the smallest message
-        {
+        tmp = (tmp == 0 && *((uint8_t *)(fffs_volume->read_buf) + i + 1) > 0) ? (*((uint8_t *)(fffs_volume->read_buf) + i + 1)) + 0xff : tmp;
+        if ((i + tmp) > SD_BLOCK_SIZE - 2)
             tmp = 0;
-        }
         else
         {
             i = i + tmp;
         }
+
     } while (tmp > 0);
 
-    if ((SD_BLOCK_SIZE - 3 - (i)) < size)
+    if (size > (SD_BLOCK_SIZE - 3 - (i)))
     {
         if (fffs_next_block(fffs_volume) == ESP_FAIL)
             return ESP_FAIL;
@@ -444,10 +443,9 @@ esp_err_t fffs_read(fffs_volume_t *fffs_vol, size_t message_num, uint8_t *messag
 
     *size = --offset;
 
-    FFFS_CHECK(message != NULL, "Read length only", size_only);
-    memcpy(message, (uint8_t *)(fffs_vol->read_buf) + index + 1 + ((*size) > 0xFF ? 1 : 0), *size);
+    if (message != NULL)
+        memcpy(message, (uint8_t *)(fffs_vol->read_buf) + index + 1 + ((*size) > 0xFF ? 1 : 0), *size);
 
-size_only:
     return ESP_OK;
 
 err:

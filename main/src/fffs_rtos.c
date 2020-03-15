@@ -53,6 +53,7 @@ release_semaphore:
 
     return message_length;
 err:
+    FRTOS_CHECK(xSemaphoreGive(fffs_head->xSemaphore) == pdTRUE, "Cannot release semaphore", release_semaphore);
     return 0;
 }
 
