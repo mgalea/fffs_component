@@ -85,7 +85,7 @@ static esp_err_t fffs_create_sector_block(fffs_volume_t *fffs_volume)
     (((fffs_partition_table_t *)fffs_volume->read_buf)->magic_number) = FFFS_MAGIC_NUMBER;
     (((fffs_sector_table_t *)fffs_volume->read_buf)->first_message) = fffs_volume->message_id;
 
-    fffs_volume->current_sector = fffs_volume->current_block;
+    fffs_volume->current_sector = fffs_volume->last_block;
     fffs_volume->messages_in_block = 0;
     fffs_volume->block_index = 0;
     for (int i = 0; i < ((SECTOR_SIZE) / (BLOCKS_IN_SECTOR)); i++)
@@ -132,6 +132,7 @@ esp_err_t fffs_format(fffs_volume_t *fffs_volume, unsigned char partition_size, 
     ESP_LOGI(TAG, "Created %d Partitions of size %d bytes.", ((fffs_partition_table_t *)sector_table)->partition_id, partition_size * (PARTITION_SIZE)*512);
     fffs_volume->last_block = 1;
     fffs_volume->current_block = 1;
+    fffs_volume->current_sector = 0;
     err = ESP_OK;
 
 fail:
@@ -157,8 +158,6 @@ static uint32_t fffs_find_lastBlock(fffs_volume_t *fffs_vol)
             ESP_LOGE(TAG, "SD Card is full!");
             goto fail;
         }
-
-        fffs_vol->messages_in_block = 0;
 
         while ((((fffs_partition_table_t *)fffs_vol->read_buf)->jump_to_next_partition) == true)
         {
@@ -186,10 +185,13 @@ static uint32_t fffs_find_lastBlock(fffs_volume_t *fffs_vol)
         fffs_vol->message_id = ((fffs_partition_table_t *)fffs_vol->read_buf)->message_id;
 
         fffs_vol->block_index = 0;
+        fffs_vol->messages_in_block = 0;
+
         while (((fffs_sector_table_t *)fffs_vol->read_buf)->sector_message_index[fffs_vol->block_index + 1] > 0)
         {
             fffs_vol->block_index++;
         }
+
         fffs_vol->messages_in_block = ((fffs_sector_table_t *)fffs_vol->read_buf)->sector_message_index[fffs_vol->block_index];
     }
 
@@ -222,6 +224,7 @@ fffs_volume_t *fffs_init(sdmmc_card_t *s_card, bool format)
     fffs_vol->partition_size = 1;
     fffs_vol->sector_size = 1;
     fffs_vol->message_rotate = false;
+    fffs_vol->messages_in_block = 0;
 
     fffs_vol->read_buf = heap_caps_malloc(block_size, MALLOC_CAP_DMA);
     FFFS_CHECK(fffs_vol->read_buf, "Cannot create read/write buffer for FFFS volume", fail);
@@ -261,16 +264,15 @@ esp_err_t fffs_deinit(fffs_volume_t *fffs_vol)
 
 static esp_err_t fffs_update_table(fffs_volume_t *fffs_volume)
 {
+    if (fffs_volume->messages_in_block == 0)
+        return ESP_FAIL;
+
     FFFS_CHECK(sdmmc_read_sectors(fffs_volume->sd_card, fffs_volume->read_buf, fffs_volume->current_sector, 1) == ESP_OK, "Cannot read sector ", fail);
 
-    fffs_volume->last_block = fffs_volume->current_block;
+    //fffs_volume->last_block = fffs_volume->current_block;
 
     (((fffs_partition_table_t *)fffs_volume->read_buf)->last_block) = fffs_volume->last_block;
     (((fffs_partition_table_t *)fffs_volume->read_buf)->message_id) = fffs_volume->message_id;
-
-    if (fffs_volume->messages_in_block == 0)
-        ESP_LOGI(TAG, "MESSAGE IS 0 AT BLOCK %d in INDEX %d", fffs_volume->current_block, fffs_volume->block_index);
-
     (((fffs_sector_table_t *)fffs_volume->read_buf)->sector_message_index[fffs_volume->block_index]) = fffs_volume->messages_in_block;
 
     FFFS_CHECK(sdmmc_write_sectors(fffs_volume->sd_card, fffs_volume->read_buf, fffs_volume->current_sector, 1) == ESP_OK, "Cannot write sector ", fail);
@@ -282,16 +284,16 @@ fail:
 
 static esp_err_t fffs_next_block(fffs_volume_t *fffs_volume)
 {
-    FFFS_CHECK(fffs_volume->current_block++ < fffs_volume->sd_card->csd.capacity, "SD CARD is full.", full_card);
+    FFFS_CHECK(fffs_volume->last_block++ < fffs_volume->sd_card->csd.capacity, "SD CARD is full.", full_card);
 
-    FFFS_CHECK(fffs_erase_block(fffs_volume, fffs_volume->current_block, 1) == ESP_OK, "Cannot create next block", fail);
+    FFFS_CHECK(fffs_erase_block(fffs_volume, fffs_volume->last_block, 1) == ESP_OK, "Cannot create next block", fail);
 
-    if (fffs_volume->current_block % (fffs_volume->partition_size * (PARTITION_SIZE)) == 0)
+    if (fffs_volume->last_block % (fffs_volume->partition_size * (PARTITION_SIZE)) == 0)
     {
         fffs_update_partition_block(fffs_volume);
     }
 
-    if (fffs_volume->current_block % (SECTOR_SIZE) == 0)
+    if (fffs_volume->last_block % (SECTOR_SIZE) == 0)
     {
         ESP_LOGI(TAG, "Creating new sector");
         fffs_create_sector_block(fffs_volume);
@@ -300,10 +302,9 @@ static esp_err_t fffs_next_block(fffs_volume_t *fffs_volume)
         return fffs_next_block(fffs_volume);
     }
 
-    if (fffs_volume->current_block % (BLOCKS_IN_SECTOR) == 0)
+    if (fffs_volume->last_block % (BLOCKS_IN_SECTOR) == 0)
     {
-        fffs_volume->last_block = fffs_volume->current_block;
-
+        //fffs_volume->last_block = fffs_volume->current_block;
         if (fffs_volume->messages_in_block > 0)
             fffs_volume->block_index++;
         fffs_volume->messages_in_block = 0;
@@ -313,7 +314,7 @@ static esp_err_t fffs_next_block(fffs_volume_t *fffs_volume)
 full_card:
     fffs_volume->current_partition = 0;
     fffs_volume->current_sector = 0;
-    fffs_volume->current_block = 0;
+    fffs_volume->last_block = 1;
     FFFS_CHECK(sdmmc_read_sectors(fffs_volume->sd_card, fffs_volume->read_buf, fffs_volume->current_partition, 1) == ESP_OK, "Cannot read partition ", fail);
     ((fffs_partition_table_t *)fffs_volume->read_buf)->card_full = true;
     ((fffs_partition_table_t *)fffs_volume->read_buf)->jump_to_next_sector = false;
@@ -332,30 +333,41 @@ fail:
 
 esp_err_t fffs_write(fffs_volume_t *fffs_volume, void *message, int size)
 {
+    static int old_last_block = 0;
+
     esp_err_t err = ESP_OK;
 
-    if (size > SD_BLOCK_SIZE - 2 || size == 0) //messages can only 510 bytes long  since the first two bytes must be reserved for the next message offset
+    if (size > SD_BLOCK_SIZE - 3 || size == 0) //messages can only 510 bytes long  since the first two bytes must be reserved for the next message offset
         return ESP_ERR_INVALID_SIZE;
 
-    fffs_volume->current_block = fffs_volume->last_block;
+    //fffs_volume->current_block = fffs_volume->last_block;
 
-    err = sdmmc_read_sectors(fffs_volume->sd_card, fffs_volume->read_buf, fffs_volume->current_block, 1);
+    err = sdmmc_read_sectors(fffs_volume->sd_card, fffs_volume->read_buf, fffs_volume->last_block, 1);
 
-    int tmp = 0, i = 0;
+    int tmp = 0;
+    static int i;
 
-    //Search for the last message written to the block
-    do
+    if (fffs_volume->last_block == old_last_block)
     {
-        tmp = *((uint8_t *)(fffs_volume->read_buf) + i);
-        tmp = (tmp == 0 && *((uint8_t *)(fffs_volume->read_buf) + i + 1) > 0) ? (*((uint8_t *)(fffs_volume->read_buf) + i + 1)) + 0xff : tmp;
-        if ((i + tmp) > SD_BLOCK_SIZE - 2)
-            tmp = 0;
-        else
-        {
-            i = i + tmp;
-        }
+        tmp = i;
+    }
+    else
+    {
+        old_last_block = fffs_volume->last_block;
+        i = 0;
+        do
+        { //This is required for when an sd card is restarted
+            tmp = *((uint8_t *)(fffs_volume->read_buf) + i);
+            tmp = (tmp == 0 && *((uint8_t *)(fffs_volume->read_buf) + i + 1) > 0) ? (*((uint8_t *)(fffs_volume->read_buf) + i + 1)) + 0x100 : tmp;
+            if ((i + tmp) > SD_BLOCK_SIZE - 2)
+                tmp = 0;
+            else
+            {
+                i = i + tmp;
+            }
 
-    } while (tmp > 0);
+        } while (tmp > 0);
+    }
 
     if (size > (SD_BLOCK_SIZE - 3 - (i)))
     {
@@ -364,19 +376,22 @@ esp_err_t fffs_write(fffs_volume_t *fffs_volume, void *message, int size)
 
         return fffs_write(fffs_volume, message, size) == ESP_OK ? ESP_OK : ESP_FAIL;
     }
+
     if (size < 255)
     {
         memcpy((uint8_t *)(fffs_volume->read_buf) + i + 1, message, size);
         *((uint8_t *)(fffs_volume->read_buf) + i) = (uint8_t)size + 1; //this is the offset not message size
+        i = i + size + 1;
     }
     else
     {
         memcpy((uint8_t *)(fffs_volume->read_buf) + i + 2, message, size);
         *((uint8_t *)(fffs_volume->read_buf) + i) = 0;                                //indicate that the message is longer than 255 characters
         *((uint8_t *)(fffs_volume->read_buf) + i + 1) = (uint8_t)((size - 0xff)) + 1; //this is the offset not message size
+        i = i + size + 2;
     }
 
-    err = sdmmc_write_sectors(fffs_volume->sd_card, fffs_volume->read_buf, fffs_volume->current_block, 1);
+    err = sdmmc_write_sectors(fffs_volume->sd_card, fffs_volume->read_buf, fffs_volume->last_block, 1);
     if (err != ESP_OK)
         return ESP_FAIL;
 
@@ -387,7 +402,7 @@ esp_err_t fffs_write(fffs_volume_t *fffs_volume, void *message, int size)
     return ESP_OK;
 }
 
-esp_err_t fffs_read(fffs_volume_t *fffs_vol, size_t message_num, uint8_t *message, int *size)
+static esp_err_t fffs_internal_read(fffs_volume_t *fffs_vol, size_t message_num, uint8_t *message, int *size, int *_block, int *_offset)
 {
 
     uint32_t fetch_block;
@@ -427,6 +442,9 @@ esp_err_t fffs_read(fffs_volume_t *fffs_vol, size_t message_num, uint8_t *messag
 
     FFFS_CHECK(sdmmc_read_sectors(fffs_vol->sd_card, fffs_vol->read_buf, fetch_block, 1) == ESP_OK, "Cannot read block", err);
 
+    if (_block != NULL)
+        *_block = fetch_block;
+
     int index = 0;
     int offset = 0;
     for (unsigned char num_offset = (message_num - old_message_base); num_offset > 0; num_offset--)
@@ -434,10 +452,13 @@ esp_err_t fffs_read(fffs_volume_t *fffs_vol, size_t message_num, uint8_t *messag
         offset = *((uint8_t *)(fffs_vol->read_buf) + index);
 
         if (offset == 0)
-            offset = 0xFF + (*((uint8_t *)(fffs_vol->read_buf) + index + 1));
+            offset = 0x100 + (*((uint8_t *)(fffs_vol->read_buf) + index + 1));
 
         index = index + offset;
     }
+
+    if (_offset != NULL)
+        *_offset = index;
 
     offset = (*((uint8_t *)(fffs_vol->read_buf) + index) == 0 ? 0xFF + (*((uint8_t *)(fffs_vol->read_buf) + index + 1)) : *((uint8_t *)(fffs_vol->read_buf) + index));
 
@@ -450,4 +471,56 @@ esp_err_t fffs_read(fffs_volume_t *fffs_vol, size_t message_num, uint8_t *messag
 
 err:
     return ESP_FAIL;
+}
+
+esp_err_t fffs_read(fffs_volume_t *fffs_vol, size_t message_num, uint8_t *message, int *size)
+{
+    int *block = NULL, *offset = NULL;
+    return fffs_internal_read(fffs_vol, message_num, message, size, block, offset);
+}
+
+esp_err_t fffs_erase(fffs_volume_t *fffs_vol, size_t message_num)
+{
+    esp_err_t err = ESP_FAIL;
+    int size;
+    int block, offset;
+    uint8_t *message = malloc(SD_BLOCK_SIZE);
+    if (message == NULL)
+        return ESP_FAIL;
+
+    FFFS_CHECK(fffs_internal_read(fffs_vol, message_num, message, &size, &block, &offset) == ESP_OK, "Cannot Read message", fail);
+    free(message);
+    message = calloc(size, 1);
+    memcpy((uint8_t *)(fffs_vol->read_buf) + offset + 1 + (size > 0xFF ? 1 : 0), message, size);
+    free(message);
+
+    FFFS_CHECK(sdmmc_write_sectors(fffs_vol->sd_card, fffs_vol->read_buf, block, 1) == ESP_OK, "Cannot write block", fail);
+
+    err = ESP_OK;
+
+fail:
+    return err;
+}
+
+esp_err_t fffs_update(fffs_volume_t *fffs_vol, size_t message_num, uint8_t *new_message)
+{
+    esp_err_t err = ESP_FAIL;
+    int size;
+    int block, offset;
+    uint8_t *message = malloc(SD_BLOCK_SIZE);
+    if (message == NULL)
+        return ESP_FAIL;
+
+    FFFS_CHECK(fffs_internal_read(fffs_vol, message_num, message, &size, &block, &offset) == ESP_OK, "Cannot read message", fail);
+    free(message);
+    message = calloc(size, 1);
+    memcpy((uint8_t *)(fffs_vol->read_buf) + offset + 1 + (size > 0xFF ? 1 : 0), new_message, size);
+    free(message);
+
+    FFFS_CHECK(sdmmc_write_sectors(fffs_vol->sd_card, fffs_vol->read_buf, block, 1) == ESP_OK, "Cannot write block", fail);
+
+    err = ESP_OK;
+
+fail:
+    return err;
 }

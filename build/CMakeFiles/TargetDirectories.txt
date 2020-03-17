@@ -303,6 +303,13 @@ C:/esp-idf-4-0/fffs/build/esp-idf/esp-tls/CMakeFiles/edit_cache.dir
 C:/esp-idf-4-0/fffs/build/esp-idf/esp-tls/CMakeFiles/rebuild_cache.dir
 C:/esp-idf-4-0/fffs/build/esp-idf/esp-tls/CMakeFiles/list_install_components.dir
 C:/esp-idf-4-0/fffs/build/esp-idf/esp-tls/CMakeFiles/install/strip.dir
+C:/esp-idf-4-0/fffs/build/esp-idf/esp32-idf-sqlite3/CMakeFiles/list_install_components.dir
+C:/esp-idf-4-0/fffs/build/esp-idf/esp32-idf-sqlite3/CMakeFiles/__idf_esp32-idf-sqlite3.dir
+C:/esp-idf-4-0/fffs/build/esp-idf/esp32-idf-sqlite3/CMakeFiles/install/local.dir
+C:/esp-idf-4-0/fffs/build/esp-idf/esp32-idf-sqlite3/CMakeFiles/install.dir
+C:/esp-idf-4-0/fffs/build/esp-idf/esp32-idf-sqlite3/CMakeFiles/edit_cache.dir
+C:/esp-idf-4-0/fffs/build/esp-idf/esp32-idf-sqlite3/CMakeFiles/rebuild_cache.dir
+C:/esp-idf-4-0/fffs/build/esp-idf/esp32-idf-sqlite3/CMakeFiles/install/strip.dir
 C:/esp-idf-4-0/fffs/build/esp-idf/esp_adc_cal/CMakeFiles/rebuild_cache.dir
 C:/esp-idf-4-0/fffs/build/esp-idf/esp_adc_cal/CMakeFiles/__idf_esp_adc_cal.dir
 C:/esp-idf-4-0/fffs/build/esp-idf/esp_adc_cal/CMakeFiles/install/local.dir

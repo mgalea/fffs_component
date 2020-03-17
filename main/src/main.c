@@ -33,27 +33,27 @@ void read_blocks(void *fffs_head, int blocks)
     //vTaskDelete(0);
 }
 
-void read_random_messages(void *fffs_head)
+void read_messages(void *fffs_head)
 {
     int message_num;
     uint8_t *message;
-    for (int count = 00; count < ((fffs_head_t *)fffs_head)->vol->message_id; count++)
+    while (1)
     {
         srand(esp_timer_get_time());
-        message_num = (count) % ((((fffs_head_t *)fffs_head)->vol->message_id));
+        message_num = rand() % ((((fffs_head_t *)fffs_head)->vol->message_id) - 1);
         //printf("%d\n", message_num);
-        message = calloc(fffs_head_read_binary((fffs_head_t *)fffs_head, message_num, NULL), 1);
-        print_Message2ASC(message, fffs_head_read_binary((fffs_head_t *)fffs_head, message_num, message));
-        vTaskDelay(10);
+        message = calloc(fffs_rt_read_binary((fffs_head_t *)fffs_head, message_num, NULL), 1);
+        print_Message2ASC(message, fffs_rt_read_binary((fffs_head_t *)fffs_head, message_num, message));
+
         free(message);
         fflush(stdout);
     }
+    vTaskDelete(0);
 }
-//vTaskDelete(0);
 
 static const char *TAG = "APP";
 
-static void write_blocks(fffs_head_t *fffs_head)
+void write_messages(void *fffs_head)
 {
     char template[] = "\
 Had my friends Muse grown with this growing age \
@@ -67,14 +67,18 @@ suffered the cursed tongue of the orator";
     srand(esp_timer_get_time());
 
     char message[400];
+    int message_size;
 
-    for (int x = 0; x < 300; x++)
+    uint32_t i = 0;
+    while (i++ < 100000)
     {
-        sprintf(message, "ID:%05u:Length: %02u %s", fffs_head->vol->message_id, x + 21, template);
-        fffs_head_write_binary(fffs_head, (uint8_t *)message, x + 21);
+        message_size = (21 + rand() % 360);
+        sprintf(message, "ID:%05u:Length: %02u %s", ((fffs_head_t *)fffs_head)->vol->message_id, message_size, template);
+        fffs_rt_write_binary((fffs_head_t *)fffs_head, (uint8_t *)message, message_size);
+        vTaskDelay(10);
     }
-
-    return;
+    printf("Ready writing.\n");
+    vTaskDelete(0);
 }
 
 void app_main(void)
@@ -87,7 +91,7 @@ void app_main(void)
     if (fffs_vol == NULL)
         goto err;
 
-    fffs_head_t *sas_log = fffs_rw_head_Init(fffs_vol);
+    fffs_head_t *sas_log = fffs_rt_Init(fffs_vol);
 
     ESP_LOGI(TAG, "Partitions size (%d) %d bytes.", fffs_vol->partition_size, fffs_vol->partition_size * (PARTITION_SIZE)*SD_BLOCK_SIZE);
     ESP_LOGI(TAG, "Sector size (%d) %d bytes.", fffs_vol->sector_size, fffs_vol->sector_size * (SECTOR_SIZE)*SD_BLOCK_SIZE);
@@ -100,11 +104,32 @@ void app_main(void)
     ESP_LOGI(TAG, "Number of Messages in last Block: %d.", (uint32_t)fffs_vol->messages_in_block);
 
     //fffs_format(fffs_vol,1,1,false);
-    //printf("Writing blocks.\n");
-    write_blocks(sas_log);
-    printf("Ready writing.\n");
-    read_random_messages(sas_log);
-    read_blocks(sas_log,5);
+    printf("Writing blocks.\n");
+    //write_messages(sas_log);
+    //fffs_rt_erase(sas_log, 10);
+/*
+    uint8_t *message = malloc(512);
+    uint8_t size = fffs_rt_read_binary(sas_log, 11, message);
+    uint8_t  s[510];
+
+    for (int i = 0; i < size; i++)
+    {
+        s[i] = *(message + size - i - 1);
+    }
+   
+    fffs_rt_update(sas_log, 11, s);
+
+    print_Message2ASC(message, fffs_rt_read_binary(sas_log, 11, message));
+*/
+    xTaskCreate(read_messages, "sas_log", 4096, sas_log, 5, NULL);
+    xTaskCreate(write_messages, "mqtt_log", 4096, sas_log, 6, NULL);
+
+    while (1)
+    {
+        vTaskDelay(50);
+        //ESP_LOGI(TAG,"Time: %d", esp_timer_get_time());
+    }
+
 err:
     sd_card_deinit(s_card);
 }

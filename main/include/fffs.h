@@ -69,4 +69,8 @@ esp_err_t fffs_write(fffs_volume_t *fffs_volume, void *message, int size);
 
 esp_err_t fffs_read(fffs_volume_t *fffs_vol, size_t message_num, uint8_t *message, int *size);
 
+esp_err_t fffs_erase(fffs_volume_t *fffs_vol, size_t message_num);
+
+esp_err_t fffs_update(fffs_volume_t *fffs_vol, size_t message_num, uint8_t *new_message);
+
 #endif
