@@ -23,7 +23,8 @@
                 "C:\\Users\\Dell\\AppData\\Local\\Arduino15\\packages\\esp8266\\hardware\\esp8266\\2.3.0\\**"
             ],
             "forcedInclude": [],
-            "compileCommands": "${workspaceFolder}/build/compile_commands.json"
+            "compileCommands": "${workspaceFolder}/build/compile_commands.json",
+            "configurationProvider": "vector-of-bool.cmake-tools"
         }
     ],
     "version": 4

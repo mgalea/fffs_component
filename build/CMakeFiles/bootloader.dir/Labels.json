@@ -2,34 +2,34 @@
 	"sources" : 
 	[
 		{
-			"file" : "C:/esp-idf-4-0/fffs/build/CMakeFiles/bootloader"
+			"file" : "C:/esp-idf-4-0/fffs_test/build/CMakeFiles/bootloader"
 		},
 		{
-			"file" : "C:/esp-idf-4-0/fffs/build/CMakeFiles/bootloader.rule"
+			"file" : "C:/esp-idf-4-0/fffs_test/build/CMakeFiles/bootloader.rule"
 		},
 		{
-			"file" : "C:/esp-idf-4-0/fffs/build/CMakeFiles/bootloader-complete.rule"
+			"file" : "C:/esp-idf-4-0/fffs_test/build/CMakeFiles/bootloader-complete.rule"
 		},
 		{
-			"file" : "C:/esp-idf-4-0/fffs/build/bootloader-prefix/src/bootloader-stamp/bootloader-install.rule"
+			"file" : "C:/esp-idf-4-0/fffs_test/build/bootloader-prefix/src/bootloader-stamp/bootloader-install.rule"
 		},
 		{
-			"file" : "C:/esp-idf-4-0/fffs/build/bootloader-prefix/src/bootloader-stamp/bootloader-mkdir.rule"
+			"file" : "C:/esp-idf-4-0/fffs_test/build/bootloader-prefix/src/bootloader-stamp/bootloader-mkdir.rule"
 		},
 		{
-			"file" : "C:/esp-idf-4-0/fffs/build/bootloader-prefix/src/bootloader-stamp/bootloader-download.rule"
+			"file" : "C:/esp-idf-4-0/fffs_test/build/bootloader-prefix/src/bootloader-stamp/bootloader-download.rule"
 		},
 		{
-			"file" : "C:/esp-idf-4-0/fffs/build/bootloader-prefix/src/bootloader-stamp/bootloader-update.rule"
+			"file" : "C:/esp-idf-4-0/fffs_test/build/bootloader-prefix/src/bootloader-stamp/bootloader-update.rule"
 		},
 		{
-			"file" : "C:/esp-idf-4-0/fffs/build/bootloader-prefix/src/bootloader-stamp/bootloader-patch.rule"
+			"file" : "C:/esp-idf-4-0/fffs_test/build/bootloader-prefix/src/bootloader-stamp/bootloader-patch.rule"
 		},
 		{
-			"file" : "C:/esp-idf-4-0/fffs/build/bootloader-prefix/src/bootloader-stamp/bootloader-configure.rule"
+			"file" : "C:/esp-idf-4-0/fffs_test/build/bootloader-prefix/src/bootloader-stamp/bootloader-configure.rule"
 		},
 		{
-			"file" : "C:/esp-idf-4-0/fffs/build/bootloader-prefix/src/bootloader-stamp/bootloader-build.rule"
+			"file" : "C:/esp-idf-4-0/fffs_test/build/bootloader-prefix/src/bootloader-stamp/bootloader-build.rule"
 		}
 	],
 	"target" : 
