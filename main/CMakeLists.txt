@@ -1,8 +1,4 @@
-idf_component_register(SRCS "src/fffs.c"
-                            "src/fffs_utils.c"
-                            "src/fffs_disk.c"
-                            "src/main.c"
-                            "src/fffs_rtos.c"
+idf_component_register(SRCS "src/main.c"
                     INCLUDE_DIRS 
                     "include"
                     ".")
